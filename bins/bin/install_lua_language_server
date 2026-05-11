@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script installs the latest lua_language_server release available on github.
+
+
+RELEASE_INFO=$(curl https://api.github.com/repos/luals/lua-language-server/releases/latest | jq '{ tag: .tag_name, urls: [.assets[].browser_download_url] }')
+RELEASE_TAG=$(echo "$RELEASE_INFO" | jq -r '.tag')
+RELEASE_URL=$(echo "$RELEASE_INFO" | jq -r '.urls[]' | grep linux-x64)
+
+echo "Installing lua-language-server ${RELEASE_TAG}..."
+
+ARCHIVE="luals.tar.gz"
+
+LUALS_INSTALL_DIR="$HOME/.local/luals"
+[[ -d "$LUALS_INSTALL_DIR" ]] && rm -rf "$LUALS_INSTALL_DIR"
+[[ -d "$LUALS_INSTALL_DIR" ]] || mkdir -p "$LUALS_INSTALL_DIR"
+
+pushd /tmp
+
+curl -L -o "$ARCHIVE" "$RELEASE_URL"
+tar -C "$LUALS_INSTALL_DIR" -x -f /tmp/"$ARCHIVE"
+rm "$ARCHIVE"
+
+popd
+
+# Create executable wrapper script in .local/bin
+WRAPPER="$HOME/.local/bin/lua-language-server"
+[[ -e "$WRAPPER" ]] && rm "$WRAPPER"
+cat << 'EOF' > "$WRAPPER"
+#!/usr/bin/env bash
+exec "$HOME/.local/luals/bin/lua-language-server" "$@"
+EOF
+chmod +x "$WRAPPER"

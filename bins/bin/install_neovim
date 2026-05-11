@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script installs the given ($1) version of Neovim from source into '.local/nvim' 
+# and creates a 'nvim' link to its executable in '.local/bin'.
+# 
+# NVIM_REMOTE_REPO : URL of the Neovim source repository
+# VERSION          : The version (tag) to install passed as first argument
+# NVIM_INSTALL_DIR : The local directory where Neovim will be installed.
+
+NVIM_REMOTE_REPO="https://github.com/neovim/neovim"
+VERSION=$1
+NVIM_INSTALL_DIR="$HOME/.local/nvim"
+NVIM_SHARE_DIR="$HOME/.local/share/nvim"
+NVIM_STATE_DIR="$HOME/.local/state/nvim"
+LOCAL_BIN_DIR="$HOME/.local/bin"
+
+
+CURRENT_VERSION=$([[ -d "$NVIM_INSTALL_DIR" ]] && echo $($NVIM_INSTALL_DIR/bin/nvim --version | head -n 1 | awk {'print $2'}))
+
+if [[ $CURRENT_VERSION = $VERSION ]] ; then 
+  echo "Neovim $VERSION already installed in $NVIM_INSTALL_DIR."
+  exit 0
+fi
+
+echo -n "Removing Neovim ${CURRENT_VERSION} installation in ${NVIM_INSTALL_DIR}... "
+[[ -d $NVIM_INSTALL_DIR ]] && rm -rf $NVIM_INSTALL_DIR
+[[ -d $NVIM_SHARE_DIR ]] && rm -rf $NVIM_SHARE_DIR
+[[ -d $NVIM_STATE_DIR ]] && rm -rf $NVIM_STATE_DIR
+echo "Done"
+
+# Prepare for install
+REPOS_DIR="${HOME}/Repos"
+[[ -d $REPOS_DIR ]] || mkdir ${REPOS_DIR}
+
+pushd ${REPOS_DIR}
+
+# Build and install
+NVIM_REPO="neovim"
+if [[ ! -d "$NVIM_REPO" ]] ; then
+  git clone https://github.com/neovim/neovim $NVIM_REPO 
+fi
+cd $NVIM_REPO
+# TODO Figure out how to check that we're actually in Neovim repo, eg check 
+# that the remote match NVIM_REMOTE_REPO
+git fetch -a 
+git checkout $VERSION
+make distclean
+make CMAKE_BUILD_TYPE=RelWithDebInfo CMAKE_INSTALL_PREFIX=$NVIM_INSTALL_DIR 
+make install
+
+# Creating link in ~/.local/bin
+if [[ ! -e "$LOCAL_BIN_DIR/nvim" ]] ; then
+  cd $LOCAL_BIN_DIR
+  ln -s $NVIM_INSTALL_DIR/bin/nvim nvim
+fi
+
+popd
+
