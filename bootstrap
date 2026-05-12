@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This script is the main entry point to bootstrap a full configuration
-# on a new computer.
+# This script is the main entry point to bootstrap a new computer
 
-# Bootstrap config with a fiew required packages.
+# Install required packages
 REQ_PKG="cmake curl gcc gdb git jq lazygit make kitty stow wget xsel"
 MISSING_PKG=()
 for pkg in $REQ_PKG ; do
@@ -17,7 +16,7 @@ for pkg in $REQ_PKG ; do
 done
 
 if [[ ${#MISSING_PKG[@]} -gt 0 ]] ; then
-  echo "Installing missing package(s): ${MISSING_PKG[*]}"
+  echo "Info : Installing missing package(s): ${MISSING_PKG[*]}"
   sudo apt install "${MISSING_PKG[@]}"
 fi
 
@@ -25,6 +24,7 @@ fi
 if path=$(command -v rustup 2> /dev/null) ; then
   rustup self update
   rustup update
+  cargo install-update -a
 else 
   # Install rust toolchain without modifying PATH as it is already in stowed config files
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q -y -c rust-analyzer --no-modify-path
@@ -40,3 +40,13 @@ install_lua_language_server "$LUALS_VERSION"
 NEOVIM_VERSION="v0.12.2"
 install_neovim "$NEOVIM_VERSION"
 
+# Make sure we call stow from ~/Setup so that
+# the stow directory is '~/Setup' and 
+# the target direcotry is '~/'.
+# See 'info stow' for the terminology and why it matters
+if pushd ~/Setup >/dev/null ; then
+  stow -S shell
+  popd >/dev/null
+else
+  echo "Error: No '~/Setup' directory." >&2 ; exit 1
+fi
