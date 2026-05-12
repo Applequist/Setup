@@ -29,6 +29,7 @@ else
   # Install rust toolchain without modifying PATH as it is already in stowed config files
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q -y -c rust-analyzer --no-modify-path
   source "$HOME/.cargo/env"
+  cargo install cargo-update
   cargo install ripgrep
   cargo install bacon
 fi
