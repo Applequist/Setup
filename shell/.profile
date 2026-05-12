@@ -16,11 +16,6 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
-# set PAHT so it includes config scripts
-if [ -d "$HOME/.local/config/bin" ] ; then
-  PATH="$HOME/.local/config/bin:$PATH"
-fi
-
 # set PATH so it includes user's private bin if it exists
 if [ -d "$HOME/bin" ] ; then
     PATH="$HOME/bin:$PATH"
