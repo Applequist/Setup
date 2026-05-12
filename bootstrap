@@ -3,6 +3,8 @@ set -euo pipefail
 
 # This script is the main entry point to bootstrap a new computer
 
+DIR=$(dirname $0)
+
 # Install required packages
 REQ_PKG="cmake curl gcc gdb git jq lazygit make kitty stow wget xsel"
 MISSING_PKG=()
@@ -36,10 +38,11 @@ fi
 
 # Install lua_language_server 
 LUALS_VERSION="3.18.2"
-install_lua_language_server "$LUALS_VERSION"
+"$DIR"/bins/bin/install_lua_language_server "$LUALS_VERSION"
 
+# Install neovim
 NEOVIM_VERSION="v0.12.2"
-install_neovim "$NEOVIM_VERSION"
+"$DIR"/bins/bin/install_neovim "$NEOVIM_VERSION"
 
 # Make sure we call stow from ~/Setup so that
 # the stow directory is '~/Setup' and 
