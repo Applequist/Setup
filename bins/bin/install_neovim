@@ -14,25 +14,35 @@ fi
 NVIM_INSTALL_DIR="$HOME/.local/nvim"
 
 # Fetch actual VERSION (if TAG = 'latest') and download URL for linux x86_64 platform
-RELEASE_INFO=$(curl -s https://api.github.com/repos/neovim/neovim/releases/"$TAG" | jq -r '{ version: .tag_name, urls: [.assets[].browser_download_url] }')
-VERSION=$(echo "$RELEASE_INFO" | jq -r '.version')
-DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r '.urls[]' | grep linux-x86_64.tar.gz)
-
-CURRENT_VERSION=$("$NVIM_INSTALL_DIR"/bin/nvim --version | head -n 1 | awk '{print $2}' || true)
-if [[ "$CURRENT_VERSION" = "$VERSION" ]] ; then 
-  echo "Neovim $VERSION already installed in $NVIM_INSTALL_DIR."
-  exit 0
+RESPONSE=$(curl -s https://api.github.com/repos/neovim/neovim/releases/"$TAG")
+ERR=$(echo "$RESPONSE" | jq -r '.status')
+if [[ "$ERR" = "404" ]] ; then
+  echo "Error: Neovim assets info not for version '$1'. Please check version and try again." >&2; exit 1
 fi
 
-echo -n "Removing Neovim $CURRENT_VERSION installation in $NVIM_INSTALL_DIR... "
-NVIM_SHARE_DIR="$HOME/.local/share/nvim"
-NVIM_STATE_DIR="$HOME/.local/state/nvim"
-[[ -d $NVIM_INSTALL_DIR ]] && rm -rf "$NVIM_INSTALL_DIR"
-[[ -d $NVIM_SHARE_DIR ]] && rm -rf "$NVIM_SHARE_DIR"
-[[ -d $NVIM_STATE_DIR ]] && rm -rf "$NVIM_STATE_DIR"
-echo "Done"
+RELEASE_INFO=$(echo $RESPONSE | jq -r '{ version: .tag_name, urls: [.assets[].browser_download_url] }')
+VERSION=$(echo "$RELEASE_INFO" | jq -r '.version')
+DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r '.urls[]' | grep linux-x86_64.tar.gz)
+if [[ -z "$DOWNLOAD_URL" ]]; then
+  echo "Error: no linux-x86_64 asset found for neovim '$VERSION'" >&2; exit 1
+fi
 
-echo -n "Installing Neovim ${VERSION}... "
+CURRENT_VERSION=$("$NVIM_INSTALL_DIR"/bin/nvim --version 2>/dev/null | head -n 1 | awk '{print $2}' || true)
+if [[ "$CURRENT_VERSION" = "$VERSION" ]] ; then
+  echo "Info : Neovim version '$VERSION' is already installed in '$NVIM_INSTALL_DIR'. Done" ; exit 0
+fi
+
+if [[ -n "$CURRENT_VERSION" ]]; then
+  echo -n "Info : Removing Neovim version '$CURRENT_VERSION' installation in '$NVIM_INSTALL_DIR'... "
+  NVIM_SHARE_DIR="$HOME/.local/share/nvim"
+  NVIM_STATE_DIR="$HOME/.local/state/nvim"
+  [[ -d $NVIM_INSTALL_DIR ]] && rm -rf "$NVIM_INSTALL_DIR"
+  [[ -d $NVIM_SHARE_DIR ]] && rm -rf "$NVIM_SHARE_DIR"
+  [[ -d $NVIM_STATE_DIR ]] && rm -rf "$NVIM_STATE_DIR"
+  echo "Done"
+fi
+
+echo -n "Info : Installing Neovim version '${VERSION}' in '$NVIM_INSTALL_DIR'... "
 [[ -d "$NVIM_INSTALL_DIR" ]] || mkdir -p "$NVIM_INSTALL_DIR"
 
 pushd /tmp > /dev/null

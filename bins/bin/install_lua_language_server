@@ -14,27 +14,37 @@ fi
 LUALS_INSTALL_DIR="$HOME/.local/luals"
 
 # Fetch actual VERSION (if TAG = 'latest') and download URL for linux x86_64 platform
-RELEASE_INFO=$(curl -s https://api.github.com/repos/luals/lua-language-server/releases/"$TAG" | jq -r '{ version: .tag_name, urls: [.assets[].browser_download_url] }')
-VERSION=$(echo "$RELEASE_INFO" | jq -r '.version')
-DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r '.urls[]' | grep linux-x64)
-
-CURRENT_VERSION=$("$LUALS_INSTALL_DIR"/bin/lua-language-server --version || true)
-if [[ "$CURRENT_VERSION" = "$VERSION" ]] ; then 
-  echo "lua-language-server $VERSION already installed in $LUALS_INSTALL_DIR."
-  exit 0
+RESPONSE=$(curl -s https://api.github.com/repos/luals/lua-language-server/releases/"$TAG")
+ERR=$(echo "$RESPONSE" | jq -r '.status')
+if [[ "$ERR" = "404" ]] ; then
+  echo "Error: lua-language-server assets info not found for version '$1'. Please check version and try again." >&2; exit 1
 fi
 
-echo -n "Removing lua-language-server $CURRENT_VERSION installation in $LUALS_INSTALL_DIR... "
-[[ -d $LUALS_INSTALL_DIR ]] && rm -rf "$LUALS_INSTALL_DIR"
-echo "Done"
+RELEASE_INFO=$(echo "$RESPONSE" | jq -r '{ version: .tag_name, urls: [.assets[].browser_download_url] }')
+VERSION=$(echo "$RELEASE_INFO" | jq -r '.version')
+DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r '.urls[]' | grep linux-x64)
+if [[ -z "$DOWNLOAD_URL" ]]; then
+  echo "Error: no linux-x64 asset found for lua-language-server version '$VERSION'" >&2; exit 1
+fi
 
-echo -n "Installing lua-language-server ${VERSION}... "
+CURRENT_VERSION=$("$LUALS_INSTALL_DIR"/bin/lua-language-server --version 2>/dev/null || true)
+if [[ "$CURRENT_VERSION" = "$VERSION" ]] ; then
+  echo "Info : lua-language-server version '$VERSION' already installed in '$LUALS_INSTALL_DIR'." ; exit 0
+fi
+
+if [[ -n "$CURRENT_VERSION" ]]; then
+  echo -n "Info : Removing lua-language-server version '$CURRENT_VERSION' installation found in '$LUALS_INSTALL_DIR'... "
+  [[ -d $LUALS_INSTALL_DIR ]] && rm -rf "$LUALS_INSTALL_DIR"
+  echo "Done"
+fi
+
+echo -n "Info : Installing lua-language-server version '${VERSION}' in '$LUALS_INSTALL_DIR'... "
 [[ -d "$LUALS_INSTALL_DIR" ]] || mkdir -p "$LUALS_INSTALL_DIR"
 
 pushd /tmp > /dev/null
 
 ARCHIVE="luals.tar.gz"
-curl -L -o "$ARCHIVE" "$DOWNLOAD_URL"
+curl -s -L "$DOWNLOAD_URL" -o "$ARCHIVE"
 tar -C "$LUALS_INSTALL_DIR" -x -f /tmp/"$ARCHIVE"
 rm "$ARCHIVE"
 
