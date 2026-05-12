@@ -6,18 +6,19 @@ set -euo pipefail
 
 # Bootstrap config with a fiew required packages.
 REQ_PKG="cmake curl gcc gdb git jq lazygit make kitty wget xsel"
+MISSING_PKG=()
 for pkg in $REQ_PKG ; do
-  if path=$(command -v "${pkg}" 2> /dev/null) ; then
+  if path=$(command -v "${pkg}" 2>/dev/null) ; then
     echo "${pkg} -> ${path}"
-  else 
+  else
     echo "${pkg} -> Missing"
-    MISSING_PKG+=" ${pkg}"
+    MISSING_PKG+=("${pkg}")
   fi
 done
 
-if [[ -v MISSING_PKG && -n "${MISSING_PKG}" ]] ; then
-  echo "Installing missing package(s) ${MISSING_PKG}"
-  sudo apt install "${MISSING_PKG}"
+if [[ ${#MISSING_PKG[@]} -gt 0 ]] ; then
+  echo "Installing missing package(s): ${MISSING_PKG[*]}"
+  sudo apt install "${MISSING_PKG[@]}"
 fi
 
 # Install rust and rust tools
@@ -26,6 +27,7 @@ if path=$(command -v rustup 2> /dev/null) ; then
   rustup update
 else 
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q -y -c rust-analyzer --no-modify-path
+  source "$HOME/.cargo/env"
   cargo install ripgrep
   cargo install bacon
 fi
