@@ -1,59 +1,55 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This script installs the given ($1) version of Neovim from source into '.local/nvim' 
-# and creates a 'nvim' link to its executable in '.local/bin'.
-# 
-# NVIM_REMOTE_REPO : URL of the Neovim source repository
-# VERSION          : The version (tag) to install passed as first argument
-# NVIM_INSTALL_DIR : The local directory where Neovim will be installed.
+# This script installs Neovim version ($1) from Github into '~/.local/nvim'
+# and creates a 'nvim' link to its executable in '~/.local/bin'.
+#
+# $1 : version to install as 'vM.n.p' or 'latest'. Default to 'latest'.
 
-NVIM_REMOTE_REPO="https://github.com/neovim/neovim"
-VERSION=$1
+TAG="${1:-latest}"
+if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]] ; then
+  TAG="tags/$TAG"
+fi
+
 NVIM_INSTALL_DIR="$HOME/.local/nvim"
-NVIM_SHARE_DIR="$HOME/.local/share/nvim"
-NVIM_STATE_DIR="$HOME/.local/state/nvim"
-LOCAL_BIN_DIR="$HOME/.local/bin"
 
+# Fetch actual VERSION (if TAG = 'latest') and download URL for linux x86_64 platform
+RELEASE_INFO=$(curl -s https://api.github.com/repos/neovim/neovim/releases/"$TAG" | jq -r '{ version: .tag_name, urls: [.assets[].browser_download_url] }')
+VERSION=$(echo "$RELEASE_INFO" | jq -r '.version')
+DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r '.urls[]' | grep linux-x86_64.tar.gz)
 
-CURRENT_VERSION=$([[ -d "$NVIM_INSTALL_DIR" ]] && echo $($NVIM_INSTALL_DIR/bin/nvim --version | head -n 1 | awk {'print $2'}))
-
-if [[ $CURRENT_VERSION = $VERSION ]] ; then 
+CURRENT_VERSION=$("$NVIM_INSTALL_DIR"/bin/nvim --version | head -n 1 | awk '{print $2}' || true)
+if [[ "$CURRENT_VERSION" = "$VERSION" ]] ; then 
   echo "Neovim $VERSION already installed in $NVIM_INSTALL_DIR."
   exit 0
 fi
 
-echo -n "Removing Neovim ${CURRENT_VERSION} installation in ${NVIM_INSTALL_DIR}... "
-[[ -d $NVIM_INSTALL_DIR ]] && rm -rf $NVIM_INSTALL_DIR
-[[ -d $NVIM_SHARE_DIR ]] && rm -rf $NVIM_SHARE_DIR
-[[ -d $NVIM_STATE_DIR ]] && rm -rf $NVIM_STATE_DIR
+echo -n "Removing Neovim $CURRENT_VERSION installation in $NVIM_INSTALL_DIR... "
+NVIM_SHARE_DIR="$HOME/.local/share/nvim"
+NVIM_STATE_DIR="$HOME/.local/state/nvim"
+[[ -d $NVIM_INSTALL_DIR ]] && rm -rf "$NVIM_INSTALL_DIR"
+[[ -d $NVIM_SHARE_DIR ]] && rm -rf "$NVIM_SHARE_DIR"
+[[ -d $NVIM_STATE_DIR ]] && rm -rf "$NVIM_STATE_DIR"
 echo "Done"
 
-# Prepare for install
-REPOS_DIR="${HOME}/Repos"
-[[ -d $REPOS_DIR ]] || mkdir ${REPOS_DIR}
+echo -n "Installing Neovim ${VERSION}... "
+[[ -d "$NVIM_INSTALL_DIR" ]] || mkdir -p "$NVIM_INSTALL_DIR"
 
-pushd ${REPOS_DIR}
+pushd /tmp > /dev/null
 
-# Build and install
-NVIM_REPO="neovim"
-if [[ ! -d "$NVIM_REPO" ]] ; then
-  git clone https://github.com/neovim/neovim $NVIM_REPO 
-fi
-cd $NVIM_REPO
-# TODO Figure out how to check that we're actually in Neovim repo, eg check 
-# that the remote match NVIM_REMOTE_REPO
-git fetch -a 
-git checkout $VERSION
-make distclean
-make CMAKE_BUILD_TYPE=RelWithDebInfo CMAKE_INSTALL_PREFIX=$NVIM_INSTALL_DIR 
-make install
+ARCHIVE="nvim.tar.gz"
+curl -s -L "$DOWNLOAD_URL" -o $ARCHIVE
+tar  -xf "$ARCHIVE" -C "$NVIM_INSTALL_DIR" --strip-components=1
+rm "$ARCHIVE"
+
+popd > /dev/null
 
 # Creating link in ~/.local/bin
-if [[ ! -e "$LOCAL_BIN_DIR/nvim" ]] ; then
-  cd $LOCAL_BIN_DIR
-  ln -s $NVIM_INSTALL_DIR/bin/nvim nvim
+LOCAL_BIN_DIR="$HOME/.local/bin"
+if [[ ! -L "$LOCAL_BIN_DIR/nvim" ]] ; then
+  pushd "$LOCAL_BIN_DIR" > /dev/null
+  ln -s "$NVIM_INSTALL_DIR"/bin/nvim nvim
+  popd > /dev/null
 fi
 
-popd
-
+echo "Done"
