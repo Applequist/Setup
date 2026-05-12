@@ -5,7 +5,7 @@ set -euo pipefail
 # on a new computer.
 
 # Bootstrap config with a fiew required packages.
-REQ_PKG="cmake curl gcc gdb git jq lazygit make kitty wget xsel"
+REQ_PKG="cmake curl gcc gdb git jq lazygit make kitty stow wget xsel"
 MISSING_PKG=()
 for pkg in $REQ_PKG ; do
   if path=$(command -v "${pkg}" 2>/dev/null) ; then
@@ -26,6 +26,7 @@ if path=$(command -v rustup 2> /dev/null) ; then
   rustup self update
   rustup update
 else 
+  # Install rust toolchain without modifying PATH as it is already in stowed config files
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q -y -c rust-analyzer --no-modify-path
   source "$HOME/.cargo/env"
   cargo install ripgrep
@@ -33,8 +34,9 @@ else
 fi
 
 # Install lua_language_server 
-# TODO
+LUALS_VERSION="3.18.2"
+install_lua_language_server "$LUALS_VERSION"
 
 NEOVIM_VERSION="v0.12.2"
-install_neovim "${NEOVIM_VERSION}"
+install_neovim "$NEOVIM_VERSION"
 

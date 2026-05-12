@@ -33,7 +33,7 @@ if [[ "$CURRENT_VERSION" = "$VERSION" ]] ; then
 fi
 
 if [[ -n "$CURRENT_VERSION" ]]; then
-  echo -n "Info : Removing Neovim version '$CURRENT_VERSION' installation in '$NVIM_INSTALL_DIR'... "
+  echo -n "Info : Removing Neovim version '$CURRENT_VERSION' installation found in '$NVIM_INSTALL_DIR'... "
   NVIM_SHARE_DIR="$HOME/.local/share/nvim"
   NVIM_STATE_DIR="$HOME/.local/state/nvim"
   [[ -d $NVIM_INSTALL_DIR ]] && rm -rf "$NVIM_INSTALL_DIR"
