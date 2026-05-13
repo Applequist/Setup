@@ -1,26 +1,121 @@
-# configs
+# Setup
 
-Store your config files and setup script into *packages* and use `stow` to manage their *installation*.
+Setup helps you setup and reuse your Debian system configuration.
 
-A *package* is a group of files stored under a root directory in this repository.
 
-Current packages are:
-- 'shell' : all configuration files related to the shell itself and terminal utilities
-- 'bins'  : a collection of utilities to install/update programs.
+## Getting Started
 
-## New machine setup
+Clone this repository **in your $HOME repository**.
+Bootstrap the setup.
+Setup additional packages.
 
-The new machine must have `git` and GNU `stow` already available.
+**Do NOT delete** the repository from your computer.
 
-0. Cd into your $HOME direcotry:
+When editing your configuration locally, you actually modify the *installation image* of 
+the cooresponding package in the Setup repository. 
+
+You can commit and push the modifications so you don't loose them:
+
+Or you can just revert them.
+
+## Layout
+
+Setup/                : Setup root dir, the one containing .git when cloned. 
+  README.md           : This file.
+  bootstrap           : bootstrap script. See below.
+  data/               : Root directory for package files that are not part of their *installation image*. May contains data and other files that serves as input.
+  pkgs/               : Root directory containing packages. Act as the *stow directory* in stow parlance.
+    <pkg>/            : Package root directory. It contains the package's *installation image* (in stow parlance)
+      bin/
+        install_<pkg> : Pacakge installation/update script. Optional (if the package is pure system configuration).
+      .profile.d/     : Contains scripts sourced in .profile of the 'base' package.
+         <pkg>.env    : Package environment setup (PATH item, ...). Optional.
+      .config/        : Package configuration root
+        ...
+
+
+## Bootstrap
+
+Bootstraping a system does the following:
+- update the system: sudo apt update && sudo apt upgrade
+- install fundamental tools required for this setup to work
+- Write 'setup.env' in '$HOME/.profile.d': this export 
+- Load Gnome presets
+- setup the 'base' package
+- setup additional packages passed as arguments
+
+To bootstrap a new system, invoke 'bootstrap':
 ```
-$ cd 
+~/Setup $ ./bootstrap [pkgs]
 ```
-1. Clone the project:
+
+
+## Package setup
+
+Setting up a package '<pkg>' does the following:
+- Install or update the package by running 'Setup/<pkg>/bin/install_<pkg>' **if present**
+- Stow the package: '$ stow -S <pkg> -d $HOME/Setup'. 
+
+To setup a package, invoke 'setup':
 ```
-~ $ git clone git@github.com:Applequist/Setup 
+~/Setup $ ./setup <pkg>
 ```
-2. Call the bootstrap script:
-```
-~ $ ./Setup/bootstrap
-```
+
+
+## Setup
+
+- Configure the shell for use with other packages.
+- Configure other base tools: git, ... (tinted-theming ?)
+
+Pkgs/
+  setup/
+    .bashrc
+    .profile
+    .config/
+      git/
+        config
+    bin/
+      setup     : script use to setup packages.
+
+## Rust
+
+- Install rust stable toolchain
+- Install rust utilities: bacon, ripgrep...
+
+Pkgs/
+  rust/
+    bin/
+      install_rust
+    .profile.d/
+      rust.env
+
+## Lua
+
+- Install lua-language-server
+
+Pkgs/
+  lua/
+    bin/
+      install_lua
+
+## Themes
+
+- Install tinted-theming tinty
+
+Pkgs/
+  themes/
+    bin/
+      install_themes
+
+## Editor
+
+- Install and configure Neovim
+
+Pkgs/
+  editor/
+    bin/
+      install_editor  : Install Neovim release from Github
+    .config/
+      nvim/
+        ...           : Neovim configuration
+
