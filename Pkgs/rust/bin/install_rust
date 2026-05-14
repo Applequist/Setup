@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script checks for the existence of a rust toolchain.
+# If present it updates it and updates the additional tools using cargo-update
+# If not present, it installs the latest stable toolchain with rust-analyzer and
+# additional tools: cargo-update, ripgrep, bacon...
+
+if path=$(command -v rustup 2> /dev/null) ; then
+  rustup self update
+  rustup update
+  cargo install-update -a
+else 
+  # Install rust toolchain without modifying PATH as it is already in stowed config files
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q -y -c rust-analyzer --no-modify-path
+  source "$HOME/.cargo/env"
+  cargo install cargo-update
+  cargo install ripgrep
+  cargo install bacon
+fi
+

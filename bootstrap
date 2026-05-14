@@ -3,9 +3,8 @@ set -euo pipefail
 
 # This script is the main entry point to bootstrap a new computer
 
-DIR=$(dirname $0)
-
 # Install required packages
+# TODO: Use apt or dpkg to check whether a Debian package is installed.
 REQ_PKG="cmake curl gcc gdb git jq lazygit make kitty stow wget xsel"
 MISSING_PKG=()
 for pkg in $REQ_PKG ; do
@@ -22,35 +21,29 @@ if [[ ${#MISSING_PKG[@]} -gt 0 ]] ; then
   sudo apt install "${MISSING_PKG[@]}"
 fi
 
-# Install rust and rust tools
-if path=$(command -v rustup 2> /dev/null) ; then
-  rustup self update
-  rustup update
-  cargo install-update -a
-else 
-  # Install rust toolchain without modifying PATH as it is already in stowed config files
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q -y -c rust-analyzer --no-modify-path
-  source "$HOME/.cargo/env"
-  cargo install cargo-update
-  cargo install ripgrep
-  cargo install bacon
-fi
+# Bootstrapping
+DIR=$(dirname $0)
+SETUP_ROOT_DIR=$(realpath $DIR)
+SETUP_PKGS_DIR="$SETUP_ROOT_DIR/Pkgs"
 
-# Install lua_language_server 
-LUALS_VERSION="3.18.2"
-"$DIR"/bins/bin/install_lua_language_server "$LUALS_VERSION"
+echo "info: bootstrapping system..."
+echo "info: SETUP_ROOT_DIR: $SETUP_ROOT_DIR"
+echo "info: SETUP_PKGS_DIR: $SETUP_PKGS_DIR"
 
-# Install neovim
-NEOVIM_VERSION="v0.12.2"
-"$DIR"/bins/bin/install_neovim "$NEOVIM_VERSION"
+# Remove existing shell configuration files.
+rm "$HOME/.bashrc" 
+rm "$HOME/.profile"
 
-# Make sure we call stow from ~/Setup so that
-# the stow directory is '~/Setup' and 
-# the target direcotry is '~/'.
-# See 'info stow' for the terminology and why it matters
-if pushd ~/Setup >/dev/null ; then
-  stow -S shell
-  popd >/dev/null
-else
-  echo "Error: No '~/Setup' directory." >&2 ; exit 1
-fi
+# Write Setup env variables 
+[ -d "$HOME/.profile.d" ] || mkdir -p "$HOME/.profile.d"
+echo "export SETUP_ROOT_DIR=$SETUP_ROOT_DIR" >> "$HOME/.profile.d/setup.env"
+echo "export SETUP_PKGS_DIR=$SETUP_PKGS_DIR" >> "$HOME/.profile.d/setup.env"
+. "$HOME/.profile.d/setup.env"
+
+# Bootstrap shell configuration
+stow -S -d "$SETUP_PKGS_DIR" -t "$HOME" shell
+
+echo "info: system has been bootstrapped. To setup additional modules:"
+echo "  '$ setup <module1>'"
+
+

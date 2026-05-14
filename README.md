@@ -39,9 +39,9 @@ Setup/                : Setup root dir, the one containing .git when cloned.
 Bootstraping a system does the following:
 - update the system: sudo apt update && sudo apt upgrade
 - install fundamental tools required for this setup to work
-- Write 'setup.env' in '$HOME/.profile.d': this export 
-- Load Gnome presets
+- Write setup.env in $HOME/.profile.env: it contains Setup env variables
 - setup the 'base' package
+- Load Gnome presets [TODO]
 - setup additional packages passed as arguments
 
 To bootstrap a new system, invoke 'bootstrap':
@@ -61,14 +61,15 @@ To setup a package, invoke 'setup':
 ~/Setup $ ./setup <pkg>
 ```
 
+## Available Packages
 
-## Setup
+### shell
 
 - Configure the shell for use with other packages.
 - Configure other base tools: git, ... (tinted-theming ?)
 
 Pkgs/
-  setup/
+  shell/
     .bashrc
     .profile
     .config/
@@ -77,7 +78,7 @@ Pkgs/
     bin/
       setup     : script use to setup packages.
 
-## Rust
+### Rust
 
 - Install rust stable toolchain
 - Install rust utilities: bacon, ripgrep...
@@ -89,7 +90,7 @@ Pkgs/
     .profile.d/
       rust.env
 
-## Lua
+### Lua
 
 - Install lua-language-server
 
@@ -98,16 +99,7 @@ Pkgs/
     bin/
       install_lua
 
-## Themes
-
-- Install tinted-theming tinty
-
-Pkgs/
-  themes/
-    bin/
-      install_themes
-
-## Editor
+### Editor
 
 - Install and configure Neovim
 
@@ -118,4 +110,13 @@ Pkgs/
     .config/
       nvim/
         ...           : Neovim configuration
+
+### Themes [TODO]
+
+- Install tinted-theming tinty
+
+Pkgs/
+  themes/
+    bin/
+      install_themes
 
