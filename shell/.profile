@@ -16,7 +16,7 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
-if [[ -d "$HOME/bin" ]] ; then
+if [ -d "$HOME/bin" ] ; then
   case ":${PATH}:" in
     *:"$HOME/bin":*)
       ;;
@@ -26,7 +26,7 @@ if [[ -d "$HOME/bin" ]] ; then
   esac
 fi
 
-if [[ -d "$HOME/.local/bin" ]] ; then
+if [ -d "$HOME/.local/bin" ] ; then
   case ":${PATH}:" in
     *:"$HOME/.local/bin":*)
       ;;
@@ -36,23 +36,11 @@ if [[ -d "$HOME/.local/bin" ]] ; then
   esac
 fi
 
-# TODO When installing a tool, add a tool env setting script (or a link to it) in '.env'
-# and source them here using run-parts so we don't have to modify this script after 
-# every tool installation
-# for e in $(run-parts --list $HOME/.env) ; do
-#   if [ -r $e ] ; then
-#     . $e
-#   fi
-# done
-
-# Add '$HOME/.cargo/bin' to PATH
-if [[ -d "$HOME/.cargo/bin" ]] ; then
-  case ":${PATH}:" in
-    *:"$HOME/.cargo/bin":*)
-      ;;
-    *)
-      PATH="$HOME/.cargo/bin:$PATH"
-      ;;
-  esac
+if [ -d "$HOME/.profile.d" ] ; then
+  for f in $(run-parts --list --regexp *.env "$HOME/.profile.d") ; do
+    if [ -r "$f" ] ; then
+      . "$f"
+    fi
+  done
 fi
 
