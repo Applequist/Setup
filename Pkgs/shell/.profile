@@ -37,7 +37,7 @@ if [ -d "$HOME/.local/bin" ] ; then
 fi
 
 if [ -d "$HOME/.profile.d" ] ; then
-  for f in $(run-parts --list --regexp *.env "$HOME/.profile.d") ; do
+  for f in $(run-parts --list --regex='.*\.env' "$HOME/.profile.d") ; do
     if [ -r "$f" ] ; then
       . "$f"
     fi

@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This script sets up  *packages* by calling their install script 
-# and then stowing their installation images.
-
-for pkg ; do
-  echo "info: Setting up package ${pkg}... "
-  "$SETUP_PKGS_DIR"/${pkg}/bin/install_${pkg}
+for pkg ; do 
+  "$SETUP_PKGS_DIR/${pkg}/bin/install_${pkg}"
   stow -d "$SETUP_PKGS_DIR" -t "$HOME" ${pkg}
-  echo "info: Package ${pkg} is setup."
 done
+

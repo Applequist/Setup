@@ -17,7 +17,7 @@ for pkg in $REQ_PKG ; do
 done
 
 if [[ ${#MISSING_PKG[@]} -gt 0 ]] ; then
-  echo "Info : Installing missing package(s): ${MISSING_PKG[*]}"
+  echo "info: Installing missing package(s): ${MISSING_PKG[*]}"
   sudo apt install "${MISSING_PKG[@]}"
 fi
 
@@ -31,17 +31,18 @@ echo "info: SETUP_ROOT_DIR: $SETUP_ROOT_DIR"
 echo "info: SETUP_PKGS_DIR: $SETUP_PKGS_DIR"
 
 # Remove existing shell configuration files.
-rm "$HOME/.bashrc" 
-rm "$HOME/.profile"
+[ -e "$HOME/.bashrc" ] && rm "$HOME/.bashrc" 
+[ -e "$HOME/.profile" ] && rm "$HOME/.profile"
 
 # Write Setup env variables 
 [ -d "$HOME/.profile.d" ] || mkdir -p "$HOME/.profile.d"
+[ -e "$HOME/.profile.d/setup.env" ] && rm "$HOME/.profile.d/setup.env"
 echo "export SETUP_ROOT_DIR=$SETUP_ROOT_DIR" >> "$HOME/.profile.d/setup.env"
 echo "export SETUP_PKGS_DIR=$SETUP_PKGS_DIR" >> "$HOME/.profile.d/setup.env"
-. "$HOME/.profile.d/setup.env"
 
 # Bootstrap shell configuration
 stow -S -d "$SETUP_PKGS_DIR" -t "$HOME" shell
+. "$HOME/.profile"
 
 echo "info: system has been bootstrapped. To setup additional modules:"
 echo "  '$ setup <module1>'"
