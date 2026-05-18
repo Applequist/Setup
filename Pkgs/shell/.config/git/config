@@ -1,0 +1,52 @@
+[user]
+	name = Brieuc Desoutter
+  email = brieuc.desoutter@gmail.com
+
+[ui "color"]
+	ui = always
+
+[color]
+	ui = true
+
+[core]
+	autocrlf = input
+	safecrlf = true
+
+[merge]
+	tool = nvim -d
+
+[alias]
+	c = commit
+	s = status
+	st = status
+	ll = log --oneline
+  lg = log --oneline --graph
+	last = log -1 HEAD
+	pf = push --force-with-lease
+
+[pull]
+	ff = only
+
+[push]
+	default = simple
+
+[help]
+	# https://blog.gitbutler.com/why-is-git-autocorrect-too-fast-for-formula-one-drivers/
+	autocorrect = prompt
+
+[url "git@github.com:"]
+	insteadOf = gh:
+
+[github]
+	user = Applequist
+
+[diff]
+	algorithm = histogram
+	indentHeuristic = true
+
+[protocol]
+	version = 2
+
+[init]
+	defaultBranch = main
+
