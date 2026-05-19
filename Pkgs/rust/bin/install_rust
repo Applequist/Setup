@@ -15,8 +15,10 @@ else
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -q -y -c rust-analyzer --no-modify-path
   source "$HOME/.cargo/env"
   cargo install cargo-update
+  cargo install cargo-binstall
   cargo install bacon
   cargo install mdbook
   cargo install ripgrep
+  cargo binstall tree-sitter-cli -- cargo install failed last time I tried.
 fi
 
