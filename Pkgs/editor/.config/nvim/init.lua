@@ -26,6 +26,7 @@ opt.smartindent = true -- Smart auto-indenting
 opt.wrap = false -- Don't wrap line
 
 -- Visual settings
+opt.conceallevel = 0 -- Never conceal
 opt.list = true -- Show some invisible characters (tabs...)
 opt.listchars = 'tab:^ ,nbsp:¬,extends:»,precedes:«,trail:•'
 opt.cursorline = true -- Highlight the current line
