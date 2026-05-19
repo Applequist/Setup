@@ -81,7 +81,8 @@ Pkgs/
 ### Rust
 
 - Install rust stable toolchain
-- Install rust utilities: bacon, ripgrep...
+- Install rust utilities: bacon, ripgrep, tree-sitter-cli...
+- Install rust.env to include $HOME/.cargo/bin in PATH
 
 Pkgs/
   rust/
@@ -90,18 +91,18 @@ Pkgs/
     .profile.d/
       rust.env
 
-### Lua
+### Lua_ls
 
 - Install lua-language-server
 
 Pkgs/
   lua/
     bin/
-      install_lua
+      install_lua_ls
 
 ### Editor
 
-- Install and configure Neovim
+- Install and configure Neovim for Lua, Rust programming
 
 Pkgs/
   editor/
@@ -119,4 +120,19 @@ Pkgs/
   themes/
     bin/
       install_themes
+
+## TODO
+
+### Editor
+
+- Configure treesitter
+- Configure LSP features:
+  - completions
+  - diagnostics
+  -...
+
+### Python
+
+TODO
+
 
