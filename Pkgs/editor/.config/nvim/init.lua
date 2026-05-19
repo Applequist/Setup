@@ -191,7 +191,10 @@ require('nvim-treesitter').install({'rust'})
 -- step 1: manual config
 -- vim.lsp.config() or put config in <config_dir>/lsp/<my_lang_server>/
 -- vim.lsp.enable(<my_lang_server>)
-vim.lsp.enable('lua_ls')
+vim.lsp.enable {
+  'lua_ls',
+  'rust_analyzer',
+}
 
 --
 -- step 2: Use nvim-lspconfig plugin
@@ -223,3 +226,4 @@ vim.lsp.enable('lua_ls')
 --   ensure_installed = { lua_ls, ts_ls, eslint_d }
 -- })
 --
+
