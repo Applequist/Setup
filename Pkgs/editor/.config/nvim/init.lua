@@ -63,8 +63,8 @@ opt.path:append("**") -- Include subdirectories in search
 opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus" -- Disable system clipboard when SSHing to remote server but enable it locally
 
 -- Completion
-opt.completeopt = "menu,menuone,noselect"
-
+opt.completeopt = "fuzzy,menuone,noinsert,popup"
+opt.wildoptions = "fuzzy,pum"
 
 ---------------------------------------------------------
 -- Keymaps
@@ -127,7 +127,6 @@ map("t", "<C-j>", "<cmd>wincmd j<CR>", { desc = "Go to lower window" })
 map("t", "<C-k>", "<cmd>wincmd k<CR>", { desc = "Go to upper window" })
 map("t", "<C-l>", "<cmd>wincmd l<CR>", { desc = "Go to right window" })
 map("t", "<C-/>", "<cmd>close<CR>", { desc = "Hide Terminal" })
-
 
 ---------------------------------------------------------
 -- Diagnostics
