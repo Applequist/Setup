@@ -131,9 +131,14 @@ map("t", "<C-/>", "<cmd>close<CR>", { desc = "Hide Terminal" })
 ---------------------------------------------------------
 -- Diagnostics
 ---------------------------------------------------------
--- Allow virtual text
-vim.diagnostic.config({ virtual_text = true, virtual_lines = false })
-
+-- * If multiple diagnostic on a line, show sign for highest severity,
+-- * Disable diagnostic messages at the end of line ('virtual_text')
+-- * Enable 'virtual_lines' but only for the current line
+vim.diagnostic.config({
+  severity_sort = true,
+  virtual_text = false,
+  virtual_lines = { current_line = true },
+})
 
 ---------------------------------------------------------
 -- Autocommands
