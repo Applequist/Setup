@@ -1,24 +1,37 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This script installs a Go toolchain.
+# This script installs a global Go toolchain in $HOME/.local/go
 # It removes pre-existing installation if any.
-# $1: Go version, eg '1.26.4'
+# $1: Go version, eg '1.26.4'. Default to latest.
 
 VERSION="${1:-1.26.4}"
 
 if path=$(command -v go 2> /dev/null) ; then
-  # TODO remove existing Go installation
-  echo "Removing existing go version..."
+  echo "Removing existing $(go version)..."
+  rm -rf "$(go env GOROOT)"
+  rm -rf "$(go env GOPATH)"
 fi
 
-# Download and install 
 pushd $HOME/Downloads
 
+# Download and install 
 ARCHIVE="go${VERSION}.linux-amd64.tar.gz"
 curl -sL "https://go.dev/dl/$ARCHIVE" -o $ARCHIVE
 tar -C "$HOME/.local" -xvf "$ARCHIVE"
 rm $ARCHIVE
 
+GOROOT="$(go env GOROOT)" # $HOME/.local/go
+
+# Set GOPATH to $HOME/.go and GOBIN to $GOPATH/bin
+GOPATH="$HOME/.go"
+[[ -d $GOPATH ]] || mkdir "$HOME/.go"
+GOBIN="$GOPATH/bin"
+$GOROOT/bin/go env -w GOPATH="$HOME/.go"
+$GOROOT/bin/go env -w GOBIN="$HOME/.go/bin"
+
 popd
+
+# Install Go tools
+$HOME/.local/go/bin/go install golang.org/x/tools/gopls@latest
 
