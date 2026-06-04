@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script installs a Go toolchain.
+# It removes pre-existing installation if any.
+# $1: Go version, eg '1.26.4'
+
+VERSION="${1:-1.26.4}"
+
+if path=$(command -v go 2> /dev/null) ; then
+  # TODO remove existing Go installation
+  echo "Removing existing go version..."
+fi
+
+# Download and install 
+pushd $HOME/Downloads
+
+ARCHIVE="go${VERSION}.linux-amd64.tar.gz"
+curl -sL "https://go.dev/dl/$ARCHIVE" -o $ARCHIVE
+tar -C "$HOME/.local" -xvf "$ARCHIVE"
+rm $ARCHIVE
+
+popd
+
