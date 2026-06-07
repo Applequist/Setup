@@ -27,6 +27,7 @@ opt.wrap = false -- Don't wrap line
 
 -- Visual settings
 opt.conceallevel = 0 -- Never conceal
+opt.concealcursor = "nc" -- conceal at cursor lines in normal and command line editingi mode
 opt.list = true -- Show some invisible characters (tabs...)
 opt.listchars = 'tab:^ ,nbsp:¬,extends:»,precedes:«,trail:•'
 opt.cursorline = true -- Highlight the current line
@@ -187,7 +188,7 @@ vim.pack.add({
 require('lualine').setup()
 -- Nvim already includes these parsers: C, Lua, Markdown...
 -- See ':h treesitter'
-require('nvim-treesitter').install({'rust'})
+require('nvim-treesitter').install({'go', 'rust'})
 
 
 ---------------------------------------------------------
@@ -197,6 +198,7 @@ require('nvim-treesitter').install({'rust'})
 -- vim.lsp.config() or put config in <config_dir>/lsp/<my_lang_server>/
 -- vim.lsp.enable(<my_lang_server>)
 vim.lsp.enable {
+  'gopls',
   'lua_ls',
   'rust_analyzer',
 }
