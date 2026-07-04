@@ -201,6 +201,7 @@ local win_config = function()
     anchor = 'NW',
     row = math.floor(0.5 * (vim.o.lines - height)),
     col = math.floor(0.5 * (vim.o.columns - width)),
+    border = 'none',
   }
 end
 
