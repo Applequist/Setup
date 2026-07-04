@@ -183,12 +183,32 @@ vim.pack.add({
     'https://github.com/nvim-tree/nvim-web-devicons',
     'https://github.com/nvim-lualine/lualine.nvim',
     'https://github.com/nvim-treesitter/nvim-treesitter',
+    {
+      src = 'https://github.com/nvim-mini/mini.pick', version = 'stable',
+    },
 })
 
 require('lualine').setup()
 -- Nvim already includes these parsers: C, Lua, Markdown...
 -- See ':h treesitter'
 require('nvim-treesitter').install({'go', 'rust'})
+
+-- Center mini.pick window
+local win_config = function() 
+  local height = math.floor(0.618 * vim.o.lines)
+  local width = math.floor(0.618 * vim.o.columns)
+  return {
+    anchor = 'NW',
+    row = math.floor(0.5 * (vim.o.lines - height)),
+    col = math.floor(0.5 * (vim.o.columns - width)),
+  }
+end
+
+require('mini.pick').setup({
+  window = {
+    config = win_config
+  }
+})
 
 
 ---------------------------------------------------------
