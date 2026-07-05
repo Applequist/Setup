@@ -102,11 +102,13 @@ map("n", "<S-l>", ":bn<CR>", { desc = "Next buffer" })
 map("n", "<Right>", ":bn<CR>", { desc = "Next buffer" })
 
 -- Search
+-- Always center next match vertically
 map('n', 'n', 'nzz', { silent = true })
 map('n', 'N', 'Nzz', { silent = true })
 map('n', '*', '*zz', { silent = true })
 map('n', '#', '#zz', { silent = true })
 map('n', 'g*', 'g*zz', { silent = true })
+-- Clear highlight
 map({ "i", "n" }, "<esc>", "<cmd>nohl<CR><esc>", { desc = "Clear hlsearch and escape" })
 
 -- Better visual block indenting (stay in visual mode)
@@ -136,43 +138,43 @@ map("t", "<C-/>", "<cmd>close<CR>", { desc = "Hide Terminal" })
 -- * Disable diagnostic messages at the end of line ('virtual_text')
 -- * Enable 'virtual_lines' but only for the current line
 vim.diagnostic.config({
-  severity_sort = true,
-  virtual_text = false,
-  virtual_lines = { current_line = true },
+	severity_sort = true,
+	virtual_text = false,
+	virtual_lines = { current_line = true },
 })
 
 ---------------------------------------------------------
 -- Autocommands
 ---------------------------------------------------------
 local function augroup(name)
-  return vim.api.nvim_create_augroup("user_" .. name, { clear = true })
+	return vim.api.nvim_create_augroup("user_" .. name, { clear = true })
 end
 
 -- Hightlight on yank
 vim.api.nvim_create_autocmd("TextYankPost", {
-  group = augroup("highlight_yank"),
-  callback = function()
-    (vim.hl or vim.highlight).on_yank()
-  end,
+	group = augroup("highlight_yank"),
+	callback = function()
+		(vim.hl or vim.highlight).on_yank()
+	end,
 })
 
 -- Resize splits if window got resized
 vim.api.nvim_create_autocmd("VimResized", {
-  group = augroup("resize_splits"),
-  callback = function()
-    local current_tab = vim.fn.tabpagenr()
-    vim.cmd("tabdo wincmd =")
-    vim.cmd("tabnext " .. current_tab)
-  end,
+	group = augroup("resize_splits"),
+	callback = function()
+		local current_tab = vim.fn.tabpagenr()
+		vim.cmd("tabdo wincmd =")
+		vim.cmd("tabnext " .. current_tab)
+	end,
 })
 
 -- Auto create dir when saving a file
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
-  group = augroup("auto_create_dir"),
-  callback = function(event)
-    local file = vim.uv.fs_realpath(event.match) or event.match
-    vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
-  end,
+	group = augroup("auto_create_dir"),
+	callback = function(event)
+		local file = vim.uv.fs_realpath(event.match) or event.match
+		vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
+	end,
 })
 
 
@@ -180,12 +182,15 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 -- Plugins
 ---------------------------------------------------------
 vim.pack.add({
-    'https://github.com/nvim-tree/nvim-web-devicons',
-    'https://github.com/nvim-lualine/lualine.nvim',
-    'https://github.com/nvim-treesitter/nvim-treesitter',
-    {
-      src = 'https://github.com/nvim-mini/mini.pick', version = 'stable',
-    },
+	'https://github.com/nvim-tree/nvim-web-devicons',
+	'https://github.com/nvim-lualine/lualine.nvim',
+	'https://github.com/nvim-treesitter/nvim-treesitter',
+	{
+		src = 'https://github.com/nvim-mini/mini.pick', version = 'stable',
+	},
+	{
+		src = 'https://github.com/nvim-mini/mini.extra', version = 'stable',
+	}
 })
 
 require('lualine').setup()
@@ -193,23 +198,62 @@ require('lualine').setup()
 -- See ':h treesitter'
 require('nvim-treesitter').install({'go', 'rust'})
 
+---------------------------------------------------------
+-- Mini.Pick 
+---------------------------------------------------------
+vim.pack.add({
+	{
+		src = 'https://github.com/nvim-mini/mini.pick', version = 'stable',
+	},
+	{
+		src = 'https://github.com/nvim-mini/mini.extra', version = 'stable',
+	}
+})
 -- Center mini.pick window
 local win_config = function() 
-  local height = math.floor(0.618 * vim.o.lines)
-  local width = math.floor(0.618 * vim.o.columns)
-  return {
-    anchor = 'NW',
-    row = math.floor(0.5 * (vim.o.lines - height)),
-    col = math.floor(0.5 * (vim.o.columns - width)),
-    border = 'none',
-  }
+	local height = math.floor(0.618 * vim.o.lines)
+	local width = math.floor(0.618 * vim.o.columns)
+	return {
+		anchor = 'NW',
+		row = math.floor(0.5 * (vim.o.lines - height)),
+		col = math.floor(0.5 * (vim.o.columns - width)),
+		border = 'none',
+	}
 end
 
 require('mini.pick').setup({
-  window = {
-    config = win_config
-  }
+	window = {
+		config = win_config
+	}
 })
+require('mini.extra').setup()
+
+-- Find files
+map('n', '<Leader>ff', '<Cmd>Pick files<CR>', { desc = "Find files" })
+map('n', '<Leader>fg', '<Cmd>Pick grep_live<CR>', { desc = "Find files using pattern" })
+map('n', '<Leader>fr', '<Cmd>Pick git_files<CR>', { desc = "Find files in repository" })
+
+-- Find buffers
+map('n', '<Leader>fb', '<Cmd>Pick buffers<CR>', { desc = "Find buffers" })
+
+-- Find in buffer
+map('n', '<Leader>f/', '<Cmd>Pick buf_lines<CR>', { desc = "Find lines matching pattern in buffer" })
+
+-- Find code structures
+-- Add missing default LSP binding matching the one below: grd, grv
+map('n', '<Leader>gS', "<Cmd>Pick lsp scope='workspace_symbol_live'<CR>", { desc = "Find workspace symbol" })
+map('n', '<Leader>gO', "<Cmd>Pick lsp scope='document_symbol'<CR>", { desc = "Find document symbol" })
+map('n', '<Leader>grt', "<Cmd>Pick lsp scope='type_definition'<CR>", { desc = "Find type definition" })
+map('n', '<Leader>grd', "<Cmd>Pick lsp scope='definition'<CR>", { desc = "Find definition" })
+map('n', '<Leader>gri', "<Cmd>Pick lsp scope='implementation'<CR>", { desc = "Find implementation" })
+map('n', '<Leader>grv', "<Cmd>Pick lsp scope='declaration'<CR>", { desc = "Find declaration" })
+map('n', '<Leader>grr', "<Cmd>Pick lsp scope='reference'<CR>", { desc = "Find reference" })
+
+-- Find help 
+map('n', '<Leader>fh', "<Cmd>Pick help<CR>", { desc = "Find help" })
+
+-- Find keymaps
+map('n', '<Leader>fm', '<Cmd>Pick keymaps<CR>', { desc = "Find keymaps" })
 
 
 ---------------------------------------------------------
@@ -219,9 +263,9 @@ require('mini.pick').setup({
 -- vim.lsp.config() or put config in <config_dir>/lsp/<my_lang_server>/
 -- vim.lsp.enable(<my_lang_server>)
 vim.lsp.enable {
-  'gopls',
-  'lua_ls',
-  'rust_analyzer',
+	'gopls',
+	'lua_ls',
+	'rust_analyzer',
 }
 
 --
@@ -233,25 +277,25 @@ vim.lsp.enable {
 -- step 3: Use mason to install language server and mason-lspconfig to enable servers
 -- using:
 -- vim.pack.add(
---   { src = https://github.com/mason-org/mason.nvim },
---   { src = "https://github.comm/mason-org/mason-lspconfig.nvim" },
--- )
--- require('mason').setup({})
--- require('mason-lspconfig').setup({
---   ensure_installed = { lua_ls, ts_ls }
--- })
--- -- no more vim.lsp.enable({...}) required.
---
--- step 4: Use mason tool installer for linters
--- vim.pack.add(
---   { src = https://github.com/mason-org/mason.nvim },
---   { src = "https://github.comm/mason-org/mason-lspconfig.nvim" },
---   { src = "https://github.com/mason-org/mason-tool-installer.nvim" },
--- )
--- require('mason').setup({})
--- require('mason-lspconfig').setup({})
--- require('mason-tool-installer').setup({
---   ensure_installed = { lua_ls, ts_ls, eslint_d }
--- })
---
+	--   { src = https://github.com/mason-org/mason.nvim },
+	--   { src = "https://github.comm/mason-org/mason-lspconfig.nvim" },
+	-- )
+	-- require('mason').setup({})
+	-- require('mason-lspconfig').setup({
+		--   ensure_installed = { lua_ls, ts_ls }
+		-- })
+		-- -- no more vim.lsp.enable({...}) required.
+		--
+		-- step 4: Use mason tool installer for linters
+		-- vim.pack.add(
+			--   { src = https://github.com/mason-org/mason.nvim },
+			--   { src = "https://github.comm/mason-org/mason-lspconfig.nvim" },
+			--   { src = "https://github.com/mason-org/mason-tool-installer.nvim" },
+			-- )
+			-- require('mason').setup({})
+			-- require('mason-lspconfig').setup({})
+			-- require('mason-tool-installer').setup({
+				--   ensure_installed = { lua_ls, ts_ls, eslint_d }
+				-- })
+				--
 
