@@ -29,17 +29,20 @@ if [[ -z "$DOWNLOAD_URL" ]]; then
   echo "Error: no linux-x64 asset found for lua-language-server version '$VERSION'" >&2; exit 1
 fi
 
+# Exit early if requested version is already installed.
 CURRENT_VERSION=$("$LUALS_INSTALL_DIR"/bin/lua-language-server --version 2>/dev/null || true)
 if [[ "$CURRENT_VERSION" = "$VERSION" ]] ; then
   echo "Info : lua-language-server version '$VERSION' already installed in '$LUALS_INSTALL_DIR'." ; exit 0
 fi
 
+# If an old version (!= requested version) exists, remove it.
 if [[ -n "$CURRENT_VERSION" ]]; then
   echo -n "Info : Removing lua-language-server version '$CURRENT_VERSION' installation found in '$LUALS_INSTALL_DIR'... "
   [[ -d $LUALS_INSTALL_DIR ]] && rm -rf "$LUALS_INSTALL_DIR"
   echo "Done"
 fi
 
+# Installed requested version.
 echo -n "Info : Installing lua-language-server version '${VERSION}' in '$LUALS_INSTALL_DIR'... "
 [[ -d "$LUALS_INSTALL_DIR" ]] || mkdir -p "$LUALS_INSTALL_DIR"
 

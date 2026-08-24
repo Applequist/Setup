@@ -196,7 +196,7 @@ vim.pack.add({
 require('lualine').setup()
 -- Nvim already includes these parsers: C, Lua, Markdown...
 -- See ':h treesitter'
-require('nvim-treesitter').install({'go', 'rust'})
+require('nvim-treesitter').install({'bash', 'go', 'rust', 'python'})
 
 ---------------------------------------------------------
 -- Mini.Pick 
@@ -210,7 +210,7 @@ vim.pack.add({
 	}
 })
 -- Center mini.pick window
-local win_config = function() 
+local win_config = function()
 	local height = math.floor(0.618 * vim.o.lines)
 	local width = math.floor(0.618 * vim.o.columns)
 	return {
@@ -265,7 +265,9 @@ map('n', '<Leader>fm', '<Cmd>Pick keymaps<CR>', { desc = "Find keymaps" })
 vim.lsp.enable {
 	'gopls',
 	'lua_ls',
+  'pylsp',
 	'rust_analyzer',
+  'ruff',
 }
 
 --
