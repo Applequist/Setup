@@ -182,6 +182,10 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 -- Plugins
 ---------------------------------------------------------
 vim.pack.add({
+  {
+    src = 'https://github.com/kylechui/nvim-surround',
+    version = vim.version.range("4.x"),
+  },
 	'https://github.com/nvim-tree/nvim-web-devicons',
 	'https://github.com/nvim-lualine/lualine.nvim',
 	'https://github.com/nvim-treesitter/nvim-treesitter',
