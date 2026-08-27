@@ -19,6 +19,6 @@ else
   cargo install bacon
   cargo install mdbook
   cargo install ripgrep
-  cargo binstall tree-sitter-cli -- cargo install failed last time I tried.
+  cargo binstall tree-sitter-cli # cargo install failed last time I tried.
 fi
 

@@ -244,14 +244,16 @@ map('n', '<Leader>fb', '<Cmd>Pick buffers<CR>', { desc = "Find buffers" })
 map('n', '<Leader>f/', '<Cmd>Pick buf_lines<CR>', { desc = "Find lines matching pattern in buffer" })
 
 -- Find code structures
--- Add missing default LSP binding matching the one below: grd, grv
-map('n', '<Leader>gS', "<Cmd>Pick lsp scope='workspace_symbol_live'<CR>", { desc = "Find workspace symbol" })
-map('n', '<Leader>gO', "<Cmd>Pick lsp scope='document_symbol'<CR>", { desc = "Find document symbol" })
-map('n', '<Leader>grt', "<Cmd>Pick lsp scope='type_definition'<CR>", { desc = "Find type definition" })
-map('n', '<Leader>grd', "<Cmd>Pick lsp scope='definition'<CR>", { desc = "Find definition" })
-map('n', '<Leader>gri', "<Cmd>Pick lsp scope='implementation'<CR>", { desc = "Find implementation" })
-map('n', '<Leader>grv', "<Cmd>Pick lsp scope='declaration'<CR>", { desc = "Find declaration" })
-map('n', '<Leader>grr', "<Cmd>Pick lsp scope='reference'<CR>", { desc = "Find reference" })
+-- Remap defaults to using mini.pick and add missing ones (gS, grd, grv)
+map('n', 'grS', "<Cmd>Pick lsp scope='workspace_symbol_live'<CR>", { desc = "Find workspace symbol" })
+map('n', 'gO',  "<Cmd>Pick lsp scope='document_symbol'<CR>", { desc = "Find document symbol" })
+map('n', 'grv', "<Cmd>Pick lsp scope='declaration'<CR>", { desc = "Find declaration" })
+map('n', 'grr', "<Cmd>Pick lsp scope='reference'<CR>", { desc = "Find reference" })
+map('n', 'grt', "<Cmd>Pick lsp scope='type_definition'<CR>", { desc = "Find type definition" })
+map('n', 'grd', "<Cmd>Pick lsp scope='definition'<CR>", { desc = "Find definition" })
+map('n', 'gri', "<Cmd>Pick lsp scope='implementation'<CR>", { desc = "Find implementation" })
+map('n', 'gra', "<Cmd>Pick lsp scope='code_action'<CR>", { desc = "Find implementation" })
+-- grn : rename
 
 -- Find help 
 map('n', '<Leader>fh', "<Cmd>Pick help<CR>", { desc = "Find help" })
