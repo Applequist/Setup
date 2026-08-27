@@ -248,11 +248,11 @@ map('n', '<Leader>f/', '<Cmd>Pick buf_lines<CR>', { desc = "Find lines matching 
 map('n', 'grS', "<Cmd>Pick lsp scope='workspace_symbol_live'<CR>", { desc = "Find workspace symbol" })
 map('n', 'gO',  "<Cmd>Pick lsp scope='document_symbol'<CR>", { desc = "Find document symbol" })
 map('n', 'grv', "<Cmd>Pick lsp scope='declaration'<CR>", { desc = "Find declaration" })
-map('n', 'grr', "<Cmd>Pick lsp scope='reference'<CR>", { desc = "Find reference" })
+map('n', 'grr', "<Cmd>Pick lsp scope='references'<CR>", { desc = "Find references" })
 map('n', 'grt', "<Cmd>Pick lsp scope='type_definition'<CR>", { desc = "Find type definition" })
 map('n', 'grd', "<Cmd>Pick lsp scope='definition'<CR>", { desc = "Find definition" })
 map('n', 'gri', "<Cmd>Pick lsp scope='implementation'<CR>", { desc = "Find implementation" })
-map('n', 'gra', "<Cmd>Pick lsp scope='code_action'<CR>", { desc = "Find implementation" })
+-- gra : code action
 -- grn : rename
 
 -- Find help 
