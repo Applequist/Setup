@@ -161,7 +161,7 @@ return {
       },
       imports = {
         granularity = {
-          groups = module,
+          groups = "module",
         },
       },
     },
