@@ -159,6 +159,11 @@ return {
         run = { enable = true },
         updateTest = { enable = true },
       },
+      imports = {
+        granularity = {
+          groups = module,
+        },
+      },
     },
   },
   before_init = function(init_params, config)
