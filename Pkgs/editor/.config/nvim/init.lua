@@ -197,7 +197,18 @@ vim.pack.add({
 	}
 })
 
-require('lualine').setup()
+require('lualine').setup({
+  sections = {
+    lualine_c = {
+      {
+        'filename',
+        newfile_status = true,
+        path = 1,
+      }
+    },
+    lualine_y = {}
+  }
+})
 -- Nvim already includes these parsers: C, Lua, Markdown...
 -- See ':h treesitter'
 require('nvim-treesitter').install({'bash', 'go', 'rust', 'python'})
