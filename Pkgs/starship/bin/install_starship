@@ -1,0 +1,12 @@
+#! /usr/bin/env bash
+set -euo pipefail 
+
+# This script installs shell utilities 
+
+if path=$(command -v cargo 2> /dev/null) ; then
+  cargo install starship --locked 
+else 
+  curl -sS https://starship.rs/install.sh | sh -- -y
+fi
+
+
