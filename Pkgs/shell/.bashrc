@@ -112,3 +112,11 @@ if ! shopt -oq posix; then
   fi
 fi
 
+
+if [ -d "$HOME/.bashrc.d" ] ; then
+  for f in $(run-parts --list --regex='.*\.env' "$HOME/.bashrc.d") ; do
+    if [ -r "$f" ] ; then
+      . "$f"
+    fi
+  done
+fi
