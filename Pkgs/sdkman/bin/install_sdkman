@@ -1,0 +1,30 @@
+#! /usr/bin/env bash
+set -euo pipefail
+
+# This script installs sdkman.
+# If an installation is already present in '~/.sdkman', it is updated instead.
+# Shell initialization is not touched: it is already part of the stowed config
+# files (see Pkgs/shell/.bashrc).
+
+export SDKMAN_DIR="$HOME/.sdkman"
+INIT="$SDKMAN_DIR/bin/sdkman-init.sh"
+
+if [[ -s "$INIT" ]] ; then
+  echo "Info : Updating sdkman installation found in '$SDKMAN_DIR'..."
+  set +u # sdkman-init.sh does not cope with 'set -u'
+  source "$INIT"
+  sdk selfupdate force
+  sdk update # refresh the candidate list
+  set -u
+else
+  echo "Info : Installing sdkman in '$SDKMAN_DIR'..."
+  # 'rcupdate=false' : shell init is already handled by the stowed .bashrc
+  curl -s "https://get.sdkman.io?rcupdate=false" | bash
+  set +u
+  source "$INIT"
+  set -u
+fi
+
+set +u 
+sdk version
+set -u

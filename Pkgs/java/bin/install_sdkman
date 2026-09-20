@@ -1,0 +1,13 @@
+#! /usr/bin/env bash
+set -euo pipefail
+
+# This script installs sdkman.
+
+# the sdkman install script writes into our .bashrc file,
+# which we don't like!
+cp $HOME/.bashrc $HOME/.bashrc_bkp
+
+curl -s "https://get.sdkman.io" | bash
+
+
+
