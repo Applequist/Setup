@@ -189,12 +189,6 @@ vim.pack.add({
 	'https://github.com/nvim-tree/nvim-web-devicons',
 	'https://github.com/nvim-lualine/lualine.nvim',
 	'https://github.com/nvim-treesitter/nvim-treesitter',
-	{
-		src = 'https://github.com/nvim-mini/mini.pick', version = 'stable',
-	},
-	{
-		src = 'https://github.com/nvim-mini/mini.extra', version = 'stable',
-	}
 })
 
 require('lualine').setup({
@@ -213,65 +207,58 @@ require('lualine').setup({
 -- See ':h treesitter'
 require('nvim-treesitter').install({'bash', 'go', 'rust', 'python'})
 
+
 ---------------------------------------------------------
--- Mini.Pick 
+-- Telescope
 ---------------------------------------------------------
 vim.pack.add({
-	{
-		src = 'https://github.com/nvim-mini/mini.pick', version = 'stable',
-	},
-	{
-		src = 'https://github.com/nvim-mini/mini.extra', version = 'stable',
-	}
+  'https://github.com/nvim-lua/plenary.nvim',
+  'https://github.com/nvim-telescope/telescope.nvim',
+  {
+    src = 'https://github.com/nvim-telescope/telescope-fzf-native.nvim',
+    build = function()
+      vim.fn.system({ 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release --target install' })
+    end
+  },
 })
--- Center mini.pick window
-local win_config = function()
-	local height = math.floor(0.618 * vim.o.lines)
-	local width = math.floor(0.618 * vim.o.columns)
-	return {
-		anchor = 'NW',
-		row = math.floor(0.5 * (vim.o.lines - height)),
-		col = math.floor(0.5 * (vim.o.columns - width)),
-		border = 'none',
-	}
-end
 
-require('mini.pick').setup({
-	window = {
-		config = win_config
-	}
+require('telescope').load_extension('fzf')
+require('telescope').setup({
+  defaults = {
+    sorting_strategy = 'ascending',
+    layout_config = {
+      prompt_position = 'top',
+    },
+  },
 })
-require('mini.extra').setup()
+local builtin = require('telescope.builtin')
 
 -- Find files
-map('n', '<Leader>ff', '<Cmd>Pick files<CR>', { desc = "Find files" })
-map('n', '<Leader>fg', '<Cmd>Pick grep_live<CR>', { desc = "Find files using pattern" })
-map('n', '<Leader>fr', '<Cmd>Pick git_files<CR>', { desc = "Find files in repository" })
+map('n', '<Leader>ff', builtin.find_files, { desc = "Find files" })
+map('n', '<Leader>fg', builtin.live_grep, { desc = "Find files using pattern" })
+map('n', '<Leader>fr', builtin.git_files, { desc = "Find files in repository" })
 
 -- Find buffers
-map('n', '<Leader>fb', '<Cmd>Pick buffers<CR>', { desc = "Find buffers" })
+map('n', '<Leader>fb', builtin.buffers, { desc = "Find buffers" })
 
--- Find in buffer
-map('n', '<Leader>f/', '<Cmd>Pick buf_lines<CR>', { desc = "Find lines matching pattern in buffer" })
 
 -- Find code structures
--- Remap defaults to using mini.pick and add missing ones (gS, grd, grv)
-map('n', 'grS', "<Cmd>Pick lsp scope='workspace_symbol_live'<CR>", { desc = "Find workspace symbol" })
-map('n', 'gO',  "<Cmd>Pick lsp scope='document_symbol'<CR>", { desc = "Find document symbol" })
-map('n', 'grv', "<Cmd>Pick lsp scope='declaration'<CR>", { desc = "Find declaration" })
-map('n', 'grr', "<Cmd>Pick lsp scope='references'<CR>", { desc = "Find references" })
-map('n', 'grt', "<Cmd>Pick lsp scope='type_definition'<CR>", { desc = "Find type definition" })
-map('n', 'grd', "<Cmd>Pick lsp scope='definition'<CR>", { desc = "Find definition" })
-map('n', 'gri', "<Cmd>Pick lsp scope='implementation'<CR>", { desc = "Find implementation" })
+-- Remap defaults using telescope builtin functions.
+map('n', 'grS', builtin.lsp_dynamic_workspace_symbols, { desc = "Find workspace symbol" })
+map('n', 'gO',  builtin.lsp_document_symbols, { desc = "Find document symbol" })
+map('n', 'grv', builtin.lsp_definitions, { desc = "Find declaration" })
+map('n', 'grr', builtin.lsp_references, { desc = "Find references" })
+map('n', 'grt', builtin.lsp_type_definitions, { desc = "Find type definition" })
+map('n', 'grd', builtin.lsp_definitions, { desc = "Find definition" })
+map('n', 'gri', builtin.lsp_implementations, { desc = "Find implementation" })
 -- gra : code action
 -- grn : rename
 
 -- Find help 
-map('n', '<Leader>fh', "<Cmd>Pick help<CR>", { desc = "Find help" })
+map('n', '<Leader>fh', builtin.help_tags, { desc = "Find help" })
 
 -- Find keymaps
-map('n', '<Leader>fm', '<Cmd>Pick keymaps<CR>', { desc = "Find keymaps" })
-
+map('n', '<Leader>fm', builtin.keymaps, { desc = "Find keymaps" })
 
 ---------------------------------------------------------
 -- LSP
